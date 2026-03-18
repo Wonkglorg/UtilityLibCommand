@@ -1,6 +1,5 @@
 package com.wonkglorg.utilitylib.command.paged.data;
 
-import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.util.Map;
@@ -14,7 +13,6 @@ public class DataManager<T>{
 	/**
 	 * How long to keep the entries before they count as "expired"
 	 */
-	@Getter
 	private final long timeBeforeExpiry;
 	
 	public DataManager(long timeBeforeExpiry) {

@@ -1,7 +1,5 @@
 package com.wonkglorg.utilitylib.command.paged;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -11,16 +9,11 @@ import java.util.List;
 public abstract class ChatPagination<T>{
 	private Audience audience;
 	private List<T> entries;
-	@Getter
-	@Setter
 	private int pageSize = 25;
-	@Getter
 	private int page = 0;
-	@Setter
-	@Getter
 	private boolean sendHeaderAndFooterOnEmpty = true;
 	
-	public ChatPagination(List<T> entries) {
+	protected ChatPagination(List<T> entries) {
 		this.entries = entries;
 	}
 	
