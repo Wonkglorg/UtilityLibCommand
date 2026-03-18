@@ -100,4 +100,11 @@ public abstract class ChatPagination<T>{
 		return getMaxPage() + 1;
 	}
 	
+	public int getPage() {
+		return page;
+	}
+	
+	public void setSendHeaderAndFooterOnEmpty(boolean sendHeaderAndFooterOnEmpty) {
+		this.sendHeaderAndFooterOnEmpty = sendHeaderAndFooterOnEmpty;
+	}
 }
