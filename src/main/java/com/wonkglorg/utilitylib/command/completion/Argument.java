@@ -1,14 +1,15 @@
 package com.wonkglorg.utilitylib.command.completion;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Supplier;
 
 public class Argument{
 	private String argumentName;
 	private boolean required;
-	private Supplier<Set<String>> suggestions;
+	private Supplier<Collection<String>> suggestions;
 	
-	public Argument(String argumentName, boolean required, Supplier<Set<String>> suggestions) {
+	public Argument(String argumentName, boolean required, Supplier<Collection<String>> suggestions) {
 		this.argumentName = argumentName;
 		this.required = required;
 		this.suggestions = suggestions;
@@ -28,7 +29,7 @@ public class Argument{
 		return required;
 	}
 	
-	public Set<String> getSuggestions() {
+	public Collection<String> getSuggestions() {
 		return suggestions.get();
 	}
 }
