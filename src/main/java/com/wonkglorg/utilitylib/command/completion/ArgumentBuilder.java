@@ -8,9 +8,11 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import static com.wonkglorg.utilitylib.command.AbstractCommand.getArgument;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -18,6 +20,7 @@ import java.util.function.BiFunction;
 
 public class ArgumentBuilder{
 	private static final String ARGUMENT_NAME = "args";
+	private String missingArgumentsMessage = "<red>Missing required arguments %s!";
 	private final Map<String, Argument> arguments = new HashMap<>();
 	private final BiFunction<CommandContext<CommandSourceStack>, Map<String, String>, Integer> execute;
 	
@@ -31,6 +34,14 @@ public class ArgumentBuilder{
 	
 	public RequiredArgumentBuilder<CommandSourceStack, String> constructArguments() {
 		return Commands.argument(ARGUMENT_NAME, StringArgumentType.greedyString()).suggests(this::suggest).executes(this::execute);
+	}
+	
+	public String getMissingArgumentsMessage() {
+		return missingArgumentsMessage;
+	}
+	
+	public void setMissingArgumentsMessage(String missingArgumentsMessage) {
+		this.missingArgumentsMessage = missingArgumentsMessage;
 	}
 	
 	private CompletableFuture<Suggestions> suggest(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
@@ -112,7 +123,6 @@ public class ArgumentBuilder{
 				used.add(part.substring(0, idx).toLowerCase());
 			}
 		}
-		
 		return used;
 	}
 	
@@ -122,7 +132,15 @@ public class ArgumentBuilder{
 	 * @return map of keys and their assigned value
 	 */
 	public Map<String, String> parseArgs(CommandContext<CommandSourceStack> ctx) {
-		String args = getArgument(ctx, ARGUMENT_NAME, String.class, null);
+		return parseArgs(getArgument(ctx, ARGUMENT_NAME, String.class, null));
+	}
+	
+	/**
+	 * Parses Arguments
+	 *
+	 * @return map of keys and their assigned value
+	 */
+	public Map<String, String> parseArgs(String args) {
 		Map<String, String> map = new HashMap<>();
 		
 		if(args == null || args.isEmpty()) return map;
@@ -140,10 +158,23 @@ public class ArgumentBuilder{
 	}
 	
 	private int execute(CommandContext<CommandSourceStack> ctx) {
-		Map<String, String> args = parseArgs(ctx);
-		
 		if(execute == null){
 			return -1;
+		}
+		String raw = getArgument(ctx, ARGUMENT_NAME, String.class, null);
+		Map<String, String> args = parseArgs(raw);
+		
+		Set<String> usedArgs = getUsedArguments(raw);
+		
+		List<String> required = arguments.values()
+										 .stream()
+										 .filter(argument -> !usedArgs.contains(argument.getArgumentName()))
+										 .filter(Argument::isRequired)
+										 .map(Argument::getArgumentName)
+										 .toList();
+		
+		if(!required.isEmpty()){
+			ctx.getSource().getSender().sendMessage(miniMessage().deserialize(missingArgumentsMessage.formatted(String.join(", ", required))));
 		}
 		
 		return execute.apply(ctx, args);
