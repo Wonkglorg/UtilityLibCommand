@@ -100,12 +100,10 @@ public class ArgumentBuilder{
 	private void suggestKeys(SuggestionsBuilder builder, String current, Set<String> usedKeys) {
 		
 		for(String key : arguments.keySet()){
-			String keyName = key.substring(0, key.length() - 1);
-			
-			if(usedKeys.contains(keyName)) continue;
+			if(usedKeys.contains(key)) continue;
 			
 			if(key.startsWith(current)){
-				builder.suggest(key);
+				builder.suggest(key + ":");
 			}
 		}
 	}
