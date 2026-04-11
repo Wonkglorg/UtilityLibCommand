@@ -60,16 +60,60 @@ public abstract class AbstractCommand{
 		};
 	}
 	
-	public static <T> void completeMatching(Collection<T> collection, Function<T, String> toString, SuggestionsBuilder builder) {
-		collection.stream().filter(Objects::nonNull).filter(v -> toString.apply(v).toLowerCase().startsWith(builder.getRemainingLowerCase())).forEach(
-				v -> builder.suggest(toString.apply(v)));
+	/**
+	 * Returns elements from the provided list based on the current users input
+	 *
+	 * @param collection the set of completion options
+	 * @param <U> the source context
+	 * @return suggestion provider
+	 */
+	public static <U> SuggestionProvider<U> completeMatching(Collection<String> collection) {
+		return (ctx, builder) -> {
+			collection.stream()
+					  .filter(Objects::nonNull)
+					  .filter(v -> v.toLowerCase().startsWith(builder.getRemainingLowerCase()))
+					  .forEach(builder::suggest);
+			return builder.buildFuture();
+		};
 	}
 	
+	/**
+	 * Returns elements from the provided list based on the current users input
+	 *
+	 * @param collection the set of completion options
+	 * @param toString the string function for these
+	 * @param <T> value of elements
+	 * @param <U> the source context
+	 * @return suggestion provider
+	 */
 	public static <T, U> SuggestionProvider<U> completeMatching(Collection<T> collection, Function<T, String> toString) {
 		return (ctx, builder) -> {
 			collection.stream()
 					  .filter(Objects::nonNull)
-					  .filter(v -> toString.apply(v).toLowerCase().startsWith(builder.getRemainingLowerCase()))
+					  .map(toString)
+					  .filter(v -> v.toLowerCase().startsWith(builder.getRemainingLowerCase()))
+					  .forEach(builder::suggest);
+			return builder.buildFuture();
+		};
+	}
+	
+	/**
+	 * Returns elements from the provided list based on the current users input
+	 *
+	 * @param collection the set function of completion options
+	 * @param toString the string function for these
+	 * @param <T> value of elements
+	 * @param <U> the source context
+	 * @return suggestion provider
+	 */
+	public static <T, U> SuggestionProvider<U> completeMatching(Function<CommandContext<U>, Collection<T>> collection, Function<T, String> toString) {
+		return (ctx, builder) -> {
+			collection.apply(ctx)
+					  .stream()
+					  .filter(Objects::nonNull)
+					  .filter(v -> toString.apply(v)
+										   .toLowerCase()
+										   .startsWith(builder.getRemainingLowerCase()))
 					  .forEach(v -> builder.suggest(toString.apply(v)));
 			return builder.buildFuture();
 		};
