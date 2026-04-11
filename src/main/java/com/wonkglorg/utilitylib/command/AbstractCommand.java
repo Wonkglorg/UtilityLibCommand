@@ -67,8 +67,8 @@ public abstract class AbstractCommand{
 	 * @param <U> the source context
 	 * @return suggestion provider
 	 */
-	public static <U> SuggestionProvider<U> completeMatching(Collection<String> collection) {
-		return (ctx, builder) -> completeMatching(builder, collection).buildFuture();
+	public static <U> SuggestionProvider<U> suggestMatching(Collection<String> collection) {
+		return (ctx, builder) -> suggestMatching(builder, collection).buildFuture();
 	}
 	
 	/**
@@ -80,8 +80,8 @@ public abstract class AbstractCommand{
 	 * @param <U> the source context
 	 * @return suggestion provider
 	 */
-	public static <T, U> SuggestionProvider<U> completeMatching(Collection<T> collection, Function<T, String> toString) {
-		return (ctx, builder) -> completeMatching(builder, collection, toString).buildFuture();
+	public static <T, U> SuggestionProvider<U> suggestMatching(Collection<T> collection, Function<T, String> toString) {
+		return (ctx, builder) -> suggestMatching(builder, collection, toString).buildFuture();
 	}
 	
 	/**
@@ -93,8 +93,8 @@ public abstract class AbstractCommand{
 	 * @param <U> the source context
 	 * @return suggestion provider
 	 */
-	public static <T, U> SuggestionProvider<U> completeMatching(Function<CommandContext<U>, Collection<T>> collection, Function<T, String> toString) {
-		return (ctx, builder) -> completeMatching(builder, collection.apply(ctx), toString).buildFuture();
+	public static <T, U> SuggestionProvider<U> suggestMatching(Function<CommandContext<U>, Collection<T>> collection, Function<T, String> toString) {
+		return (ctx, builder) -> suggestMatching(builder, collection.apply(ctx), toString).buildFuture();
 	}
 	
 	/**
@@ -103,7 +103,7 @@ public abstract class AbstractCommand{
 	 * @param collection the set of completion options
 	 * @return suggestion provider
 	 */
-	public static SuggestionsBuilder completeMatching(SuggestionsBuilder builder, Collection<String> collection) {
+	public static SuggestionsBuilder suggestMatching(SuggestionsBuilder builder, Collection<String> collection) {
 		//@formatter:off
 		collection.stream()
 				  .filter(Objects::nonNull)
@@ -122,7 +122,7 @@ public abstract class AbstractCommand{
 	 * @param <T> value of elements
 	 * @return suggestion provider
 	 */
-	public static <T> SuggestionsBuilder completeMatching(SuggestionsBuilder builder, Collection<T> collection, Function<T, String> toString) {
+	public static <T> SuggestionsBuilder suggestMatching(SuggestionsBuilder builder, Collection<T> collection, Function<T, String> toString) {
 		//@formatter:off
 		collection.stream()
 				  .filter(Objects::nonNull)
