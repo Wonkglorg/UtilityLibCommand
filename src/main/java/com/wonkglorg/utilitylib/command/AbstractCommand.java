@@ -68,13 +68,7 @@ public abstract class AbstractCommand{
 	 * @return suggestion provider
 	 */
 	public static <U> SuggestionProvider<U> completeMatching(Collection<String> collection) {
-		return (ctx, builder) -> {
-			collection.stream()
-					  .filter(Objects::nonNull)
-					  .filter(v -> v.toLowerCase().startsWith(builder.getRemainingLowerCase()))
-					  .forEach(builder::suggest);
-			return builder.buildFuture();
-		};
+		return (ctx, builder) -> completeMatching(builder, collection).buildFuture();
 	}
 	
 	/**
@@ -87,14 +81,7 @@ public abstract class AbstractCommand{
 	 * @return suggestion provider
 	 */
 	public static <T, U> SuggestionProvider<U> completeMatching(Collection<T> collection, Function<T, String> toString) {
-		return (ctx, builder) -> {
-			collection.stream()
-					  .filter(Objects::nonNull)
-					  .map(toString)
-					  .filter(v -> v.toLowerCase().startsWith(builder.getRemainingLowerCase()))
-					  .forEach(builder::suggest);
-			return builder.buildFuture();
-		};
+		return (ctx, builder) -> completeMatching(builder, collection, toString).buildFuture();
 	}
 	
 	/**
@@ -107,16 +94,43 @@ public abstract class AbstractCommand{
 	 * @return suggestion provider
 	 */
 	public static <T, U> SuggestionProvider<U> completeMatching(Function<CommandContext<U>, Collection<T>> collection, Function<T, String> toString) {
-		return (ctx, builder) -> {
-			collection.apply(ctx)
-					  .stream()
-					  .filter(Objects::nonNull)
-					  .filter(v -> toString.apply(v)
-										   .toLowerCase()
-										   .startsWith(builder.getRemainingLowerCase()))
-					  .forEach(v -> builder.suggest(toString.apply(v)));
-			return builder.buildFuture();
-		};
+		return (ctx, builder) -> completeMatching(builder, collection.apply(ctx), toString).buildFuture();
+	}
+	
+	/**
+	 * Returns elements from the provided list based on the current users input
+	 *
+	 * @param collection the set of completion options
+	 * @return suggestion provider
+	 */
+	public static SuggestionsBuilder completeMatching(SuggestionsBuilder builder, Collection<String> collection) {
+		//@formatter:off
+		collection.stream()
+				  .filter(Objects::nonNull)
+				  .filter(v -> v.toLowerCase().startsWith(builder.getRemainingLowerCase()))
+				  .forEach(builder::suggest);
+		//@formatter:on
+		return builder;
+	}
+	
+	/**
+	 * Returns elements from the provided list based on the current users input
+	 *
+	 * @param builder the suggestionBuilder to fill
+	 * @param collection the set of completion options
+	 * @param toString the string function for these
+	 * @param <T> value of elements
+	 * @return suggestion provider
+	 */
+	public static <T> SuggestionsBuilder completeMatching(SuggestionsBuilder builder, Collection<T> collection, Function<T, String> toString) {
+		//@formatter:off
+		collection.stream()
+				  .filter(Objects::nonNull)
+				  .map(toString)
+				  .filter(v -> v.toLowerCase().startsWith(builder.getRemainingLowerCase()))
+				  .forEach(builder::suggest);
+		//@formatter:on
+		return builder;
 	}
 	
 	public static Message toMessage(Component component) {
