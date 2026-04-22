@@ -46,7 +46,7 @@ public abstract class AbstractCommand{
 		LiteralCommandNode<CommandSourceStack> node = getCommand();
 		registrar.registrar().register(node);
 		for(var alias : aliases()){
-			registrar.registrar().register(literal(alias).redirect(node).build());
+			registrar.registrar().register(literal(alias).executes(node.getCommand()).redirect(node).build());
 		}
 	}
 	
