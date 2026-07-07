@@ -35,6 +35,8 @@ public abstract class AbstractCommand{
 	
 	public abstract LiteralArgumentBuilder<CommandSourceStack> argumentBuilder();
 	
+	public abstract String description();
+	
 	public Set<String> aliases() {
 		return Set.of();
 	}
@@ -48,10 +50,7 @@ public abstract class AbstractCommand{
 	
 	public void register(ReloadableRegistrarEvent<Commands> registrar) {
 		LiteralCommandNode<CommandSourceStack> node = getCommand();
-		registrar.registrar().register(node);
-		for(var alias : aliases()){
-			registrar.registrar().register(literal(alias).executes(node.getCommand()).redirect(node).build());
-		}
+		registrar.registrar().register(node, description(), aliases());
 	}
 	
 	/**
@@ -59,7 +58,9 @@ public abstract class AbstractCommand{
 	 */
 	public static Predicate<CommandSourceStack> permissions(String... permission) {
 		return c -> {
-			if(permission.length == 0) return true;
+			if(permission.length == 0){
+				return true;
+			}
 			return Arrays.stream(permission).allMatch(p -> c.getSender().hasPermission(p));
 		};
 	}
@@ -228,8 +229,8 @@ public abstract class AbstractCommand{
 	 * @return the required argument
 	 */
 	public static <T> RequiredArgumentBuilder<CommandSourceStack, T> suggestedArgument(String argumentName,
-																					   ArgumentType<T> argumentType,
-																					   Collection<String> suggestions) {
+	                                                                                   ArgumentType<T> argumentType,
+	                                                                                   Collection<String> suggestions) {
 		return argument(argumentName, argumentType).suggests(suggestMatching(suggestions));
 	}
 	
@@ -242,8 +243,8 @@ public abstract class AbstractCommand{
 	 * @return the required argument
 	 */
 	public static <T> RequiredArgumentBuilder<CommandSourceStack, T> suggestedArgument(String argumentName,
-																					   ArgumentType<T> argumentType,
-																					   String[] suggestions) {
+	                                                                                   ArgumentType<T> argumentType,
+	                                                                                   String[] suggestions) {
 		return argument(argumentName, argumentType).suggests(suggestMatching(suggestions));
 	}
 	
@@ -256,8 +257,8 @@ public abstract class AbstractCommand{
 	 * @return the required argument
 	 */
 	public static <T> RequiredArgumentBuilder<CommandSourceStack, String> suggestedArgument(String argumentName,
-																							Collection<T> suggestions,
-																							Function<T, String> toString) {
+	                                                                                        Collection<T> suggestions,
+	                                                                                        Function<T, String> toString) {
 		return argument(argumentName, StringArgumentType.string()).suggests(suggestMatching(suggestions, toString));
 	}
 	
@@ -270,8 +271,8 @@ public abstract class AbstractCommand{
 	 * @return the required argument
 	 */
 	public static <T> RequiredArgumentBuilder<CommandSourceStack, String> suggestedArgument(String argumentName,
-																							T[] suggestions,
-																							Function<T, String> toString) {
+	                                                                                        T[] suggestions,
+	                                                                                        Function<T, String> toString) {
 		return argument(argumentName, StringArgumentType.string()).suggests(suggestMatching(suggestions, toString));
 	}
 	
@@ -285,9 +286,9 @@ public abstract class AbstractCommand{
 	 * @return the required argument
 	 */
 	public static <T, U> RequiredArgumentBuilder<CommandSourceStack, T> suggestedArgument(String argumentName,
-																						  ArgumentType<T> argumentType,
-																						  Collection<U> suggestions,
-																						  Function<U, String> toString) {
+	                                                                                      ArgumentType<T> argumentType,
+	                                                                                      Collection<U> suggestions,
+	                                                                                      Function<U, String> toString) {
 		return argument(argumentName, argumentType).suggests(suggestMatching(suggestions, toString));
 	}
 	
@@ -301,9 +302,9 @@ public abstract class AbstractCommand{
 	 * @return the required argument
 	 */
 	public static <T, U> RequiredArgumentBuilder<CommandSourceStack, T> suggestedArgument(String argumentName,
-																						  ArgumentType<T> argumentType,
-																						  U[] suggestions,
-																						  Function<U, String> toString) {
+	                                                                                      ArgumentType<T> argumentType,
+	                                                                                      U[] suggestions,
+	                                                                                      Function<U, String> toString) {
 		return argument(argumentName, argumentType).suggests(suggestMatching(suggestions, toString));
 	}
 	
